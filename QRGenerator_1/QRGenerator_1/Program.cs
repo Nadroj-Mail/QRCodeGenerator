@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 
@@ -9,11 +9,26 @@ public class QRCodeGenerator
 
     public static void Main()
     {
-        string data = "Rick Roll"; // The data to be encoded in the QR code
-        Bitmap qrCode = GenerateQRCode(data);
+        Console.Write("Data You Want To Encode: ");
+        string data = Console.ReadLine();
 
-        qrCode.Save("qrcode.png", ImageFormat.Png);
-        Console.WriteLine("Done.");
+        while (data == null)
+        {
+            if (data == null)
+            {
+                Console.WriteLine("Please Enter Data To Encode");
+            }
+            Console.Write("Data You Want To Encode: ");
+            data = Console.ReadLine();
+
+        }
+
+        Console.Write("Name of the QR-Code: ");
+        string Name_Of_Code = Console.ReadLine();
+
+        Bitmap qrCode = GenerateQRCode(data);
+        qrCode.Save($"{Name_Of_Code}.png", ImageFormat.Png);
+        Console.WriteLine("QR code generated successfully!");
     }
 
     private static Bitmap GenerateQRCode(string data)
@@ -21,7 +36,7 @@ public class QRCodeGenerator
         int dimension = (data.Length * 8) + 8; // Calculate the QR code size based on data length
         Bitmap qrCode = new(dimension, dimension);
 
-        // Set all modules/pixels to white
+        // Set all pixels to white
         for (int x = 0; x < dimension; x++)
         {
             for (int y = 0; y < dimension; y++)
@@ -30,7 +45,7 @@ public class QRCodeGenerator
             }
         }
 
-        // Encode the data in the QR code
+        // Encode the data in the QR code (It's Jank, but makes something, even if it isn't the right thing)
         int currentPosition = QuietZoneSize;
         foreach (char character in data)
         {
@@ -45,10 +60,17 @@ public class QRCodeGenerator
                 {
                     for (int y = 0; y < ModuleSize; y++)
                     {
-                        qrCode.SetPixel(currentPosition + (i * ModuleSize) + x, currentPosition + y, moduleColor);
+                        int pixelX = currentPosition + (i * ModuleSize) + x;
+                        int pixelY = currentPosition + y;
+
+                        if (pixelX < dimension && pixelY < dimension)
+                        {
+                            qrCode.SetPixel(pixelX, pixelY, moduleColor);
+                        }
                     }
                 }
             }
+
 
             currentPosition += 8 * ModuleSize;
         }
